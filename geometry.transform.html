@@ -1496,9 +1496,9 @@ be the top-left corner) with shape <span class="math notranslate nohighlight">\(
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>center</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>) – shearing center coordinates of (x, y).</p></li>
-<li><p><strong>sx</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>], <em>optional</em>) – shearing degree along x axis.
+<li><p><strong>sx</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>], <em>optional</em>) – shearing angle along x axis in radiants.
 Default:  <code class="code docutils literal notranslate"><span class="pre">None</span></code></p></li>
-<li><p><strong>sy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>], <em>optional</em>) – shearing degree along y axis.
+<li><p><strong>sy</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>], <em>optional</em>) – shearing angle along y axis in radiants
 Default:  <code class="code docutils literal notranslate"><span class="pre">None</span></code></p></li>
 </ul>
 </dd>
@@ -1552,12 +1552,12 @@ t = S_{xz}S_{zx} + (S_{xz}S_{yx} + S_{yz})S_{zy} + 1\end{split}\]</div>
 </div>
 <dl class="simple">
 <dt>Params:</dt><dd><p>center: shearing center coordinates of (x, y, z).
-sxy: shearing degree along x axis, towards y plane.
-sxz: shearing degree along x axis, towards z plane.
-syx: shearing degree along y axis, towards x plane.
-syz: shearing degree along y axis, towards z plane.
-szx: shearing degree along z axis, towards x plane.
-szy: shearing degree along z axis, towards y plane.</p>
+sxy: shearing angle along x axis, towards y plane in radiants.
+sxz: shearing angle along x axis, towards z plane in radiants.
+syx: shearing angle along y axis, towards x plane in radiants.
+syz: shearing angle along y axis, towards z plane in radiants.
+szx: shearing angle along z axis, towards x plane in radiants.
+szy: shearing angle along z axis, towards y plane in radiants.</p>
 </dd>
 </dl>
 <dl class="field-list simple">

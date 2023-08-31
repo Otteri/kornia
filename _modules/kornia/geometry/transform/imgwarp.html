@@ -986,8 +986,8 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        center: shearing center coordinates of (x, y).</span>
-<span class="sd">        sx: shearing degree along x axis.</span>
-<span class="sd">        sy: shearing degree along y axis.</span>
+<span class="sd">        sx: shearing angle along x axis in radiants.</span>
+<span class="sd">        sy: shearing angle along y axis in radiants</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        params to be passed to the affine transformation with shape :math:`(B, 3, 3)`.</span>
@@ -1106,12 +1106,12 @@
 
 <span class="sd">    Params:</span>
 <span class="sd">        center: shearing center coordinates of (x, y, z).</span>
-<span class="sd">        sxy: shearing degree along x axis, towards y plane.</span>
-<span class="sd">        sxz: shearing degree along x axis, towards z plane.</span>
-<span class="sd">        syx: shearing degree along y axis, towards x plane.</span>
-<span class="sd">        syz: shearing degree along y axis, towards z plane.</span>
-<span class="sd">        szx: shearing degree along z axis, towards x plane.</span>
-<span class="sd">        szy: shearing degree along z axis, towards y plane.</span>
+<span class="sd">        sxy: shearing angle along x axis, towards y plane in radiants.</span>
+<span class="sd">        sxz: shearing angle along x axis, towards z plane in radiants.</span>
+<span class="sd">        syx: shearing angle along y axis, towards x plane in radiants.</span>
+<span class="sd">        syz: shearing angle along y axis, towards z plane in radiants.</span>
+<span class="sd">        szx: shearing angle along z axis, towards x plane in radiants.</span>
+<span class="sd">        szy: shearing angle along z axis, towards y plane in radiants.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        params to be passed to the affine transformation.</span>
