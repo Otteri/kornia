@@ -480,11 +480,11 @@
             <span class="n">backbone</span><span class="p">,</span>
             <span class="n">HybridEncoder</span><span class="p">(</span><span class="n">backbone</span><span class="o">.</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">neck_hidden_dim</span><span class="p">,</span> <span class="n">neck_dim_feedforward</span><span class="p">,</span> <span class="n">neck_expansion</span><span class="p">),</span>
             <span class="n">RTDETRHead</span><span class="p">(</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">head_hidden_dim</span><span class="p">,</span>
-                <span class="n">config</span><span class="o">.</span><span class="n">head_num_queries</span><span class="p">,</span>
-                <span class="p">[</span><span class="n">neck_hidden_dim</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
-                <span class="n">head_num_decoder_layers</span><span class="p">,</span>
+                <span class="n">num_classes</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">num_classes</span><span class="p">,</span>
+                <span class="n">hidden_dim</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">head_hidden_dim</span><span class="p">,</span>
+                <span class="n">num_queries</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">head_num_queries</span><span class="p">,</span>
+                <span class="n">in_channels</span><span class="o">=</span><span class="p">[</span><span class="n">neck_hidden_dim</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="n">num_decoder_layers</span><span class="o">=</span><span class="n">head_num_decoder_layers</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">)</span>
 
@@ -495,23 +495,24 @@
 
 <div class="viewcode-block" id="RTDETR.forward">
 <a class="viewcode-back" href="../../../../../contrib.html#kornia.contrib.models.rt_detr.RTDETR.forward">[docs]</a>
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect objects in an image.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            images: images to be detected. Shape :math:`(N, C, H, W)`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Dictionary with keys ``logits`` and ``boxes``. ``logits`` has shape :math:`(N, Q, K)` and ``boxes`` has</span>
-<span class="sd">            shape :math:`(N, Q, 4)`, where :math:`Q` is the number of queries, :math:`K` is the number of classes.</span>
+<span class="sd">            - **logits** - Tensor of shape :math:`(N, Q, K)`, where :math:`Q` is the number of queries,</span>
+<span class="sd">              :math:`K` is the number of classes.</span>
+<span class="sd">            - **boxes** - Tensor of shape :math:`(N, Q, 4)`, where :math:`Q` is the number of queries.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">training</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Only evaluation mode is supported. Please call model.eval().&quot;</span><span class="p">)</span>
 
-        <span class="n">fmaps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backbone</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
-        <span class="n">fmaps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neck</span><span class="p">(</span><span class="n">fmaps</span><span class="p">)</span>
-        <span class="n">logits</span><span class="p">,</span> <span class="n">boxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">fmaps</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;logits&quot;</span><span class="p">:</span> <span class="n">logits</span><span class="p">,</span> <span class="s2">&quot;boxes&quot;</span><span class="p">:</span> <span class="n">boxes</span><span class="p">}</span></div>
+        <span class="n">feats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">backbone</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="n">feats_buf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">neck</span><span class="p">(</span><span class="n">feats</span><span class="p">)</span>
+        <span class="n">logits</span><span class="p">,</span> <span class="n">boxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">feats_buf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">boxes</span></div>
 </div>
 
 </pre></div>

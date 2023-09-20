@@ -324,17 +324,119 @@
           <h1>Source code for kornia.contrib.object_detection</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">kornia.core</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">concatenate</span>
-<span class="kn">from</span> <span class="nn">kornia.geometry.transform</span> <span class="kn">import</span> <span class="n">Resize</span>
+<span class="kn">from</span> <span class="nn">kornia.core.check</span> <span class="kn">import</span> <span class="n">KORNIA_CHECK_SHAPE</span>
+<span class="kn">from</span> <span class="nn">kornia.image.base</span> <span class="kn">import</span> <span class="n">ImageSize</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;BoundingBoxDataFormat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BoundingBox&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;results_from_detections&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ResizePreProcessor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ObjectDetector&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ObjectDetectorResult&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 
+<div class="viewcode-block" id="BoundingBoxDataFormat">
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.BoundingBoxDataFormat">[docs]</a>
+<span class="k">class</span> <span class="nc">BoundingBoxDataFormat</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enum class that maps bounding box data format.&quot;&quot;&quot;</span>
+
+    <span class="n">XYWH</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">XYXY</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">CXCYWH</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">CENTER_XYWH</span> <span class="o">=</span> <span class="mi">2</span></div>
+
+
+
+<span class="c1"># NOTE: probably we should use a more generic name like BoundingBox2D</span>
+<span class="c1"># and add a BoundingBox3D class for 3D bounding boxes. Also for serialization</span>
+<span class="c1"># we should have an explicit class for each format to make it more production ready</span>
+<span class="c1"># specially to serialize to protobuf and not saturate at a high rates.</span>
+
+
+<div class="viewcode-block" id="BoundingBox">
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.BoundingBox">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">BoundingBox</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bounding box data class.</span>
+
+<span class="sd">    Useful for representing bounding boxes in different formats for object detection.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: tuple of bounding box data. The length of the tuple depends on the data format.</span>
+<span class="sd">        data_format: bounding box data format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="n">data_format</span><span class="p">:</span> <span class="n">BoundingBoxDataFormat</span></div>
+
+
+
+<div class="viewcode-block" id="ObjectDetectorResult">
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.ObjectDetectorResult">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ObjectDetectorResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Object detection result.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        class_id: class id of the detected object.</span>
+<span class="sd">        confidence: confidence score of the detected object.</span>
+<span class="sd">        bbox: bounding box of the detected object in xywh format.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">class_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">confidence</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">bbox</span><span class="p">:</span> <span class="n">BoundingBox</span></div>
+
+
+
+<div class="viewcode-block" id="results_from_detections">
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.results_from_detections">[docs]</a>
+<span class="k">def</span> <span class="nf">results_from_detections</span><span class="p">(</span><span class="n">detections</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">BoundingBoxDataFormat</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ObjectDetectorResult</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a detection tensor to a list of :py:class:`ObjectDetectorResult`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        detections: tensor with shape :math:`(D, 6)`, where :math:`D` is the number of detections in the given image,</span>
+<span class="sd">            :math:`6` represents class id, score, and `xywh` bounding box.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of :py:class:`ObjectDetectorResult`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">KORNIA_CHECK_SHAPE</span><span class="p">(</span><span class="n">detections</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;D&quot;</span><span class="p">,</span> <span class="s2">&quot;6&quot;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">format</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">BoundingBoxDataFormat</span><span class="p">[</span><span class="nb">format</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
+
+    <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ObjectDetectorResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">det</span> <span class="ow">in</span> <span class="n">detections</span><span class="p">:</span>
+        <span class="n">det</span> <span class="o">=</span> <span class="n">det</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">det</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">ObjectDetectorResult</span><span class="p">(</span>
+                <span class="n">class_id</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">det</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="n">confidence</span><span class="o">=</span><span class="n">det</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">bbox</span><span class="o">=</span><span class="n">BoundingBox</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">(</span><span class="n">det</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">det</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">det</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">det</span><span class="p">[</span><span class="mi">5</span><span class="p">]),</span> <span class="n">data_format</span><span class="o">=</span><span class="nb">format</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+
+<div class="viewcode-block" id="ResizePreProcessor">
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.ResizePreProcessor">[docs]</a>
 <span class="k">class</span> <span class="nc">ResizePreProcessor</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;This module resizes a list of image tensors to the given size, and also returns the original image sizes for</span>
-<span class="sd">    further post-processing.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This module resizes a list of image tensors to the given size.</span>
+
+<span class="sd">    Additionally, also returns the original image sizes for further post-processing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">interpolation_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bilinear&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -346,23 +448,34 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">resizer</span> <span class="o">=</span> <span class="n">Resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation_mode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interpolation_mode</span> <span class="o">=</span> <span class="n">interpolation_mode</span>
 
-    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<div class="viewcode-block" id="ResizePreProcessor.forward">
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.ResizePreProcessor.forward">[docs]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Tensor</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ImageSize</span><span class="p">]]:</span>
         <span class="c1"># TODO: support other input formats e.g. file path, numpy</span>
-        <span class="c1"># NOTE: antialias=False is used in F.interpolate()</span>
-        <span class="n">original_sizes</span> <span class="o">=</span> <span class="p">[(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">imgs</span><span class="p">]</span>
-        <span class="n">resized_imgs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">resizer</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">imgs</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">concatenate</span><span class="p">(</span><span class="n">resized_imgs</span><span class="p">),</span> <span class="p">{</span><span class="s2">&quot;original_size&quot;</span><span class="p">:</span> <span class="n">original_sizes</span><span class="p">}</span>
+        <span class="n">resized_imgs</span><span class="p">,</span> <span class="n">original_sizes</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imgs</span><span class="p">)):</span>
+            <span class="n">img</span> <span class="o">=</span> <span class="n">imgs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="c1"># NOTE: assume that image layout is CHW</span>
+            <span class="n">original_sizes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ImageSize</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+            <span class="n">resized_imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="c1"># TODO: fix kornia resize to support onnx</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interpolation_mode</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">concatenate</span><span class="p">(</span><span class="n">resized_imgs</span><span class="p">),</span> <span class="n">original_sizes</span></div>
+</div>
 
 
+
+<span class="c1"># TODO: move this to kornia.models as AlgorithmicModel api</span>
 <div class="viewcode-block" id="ObjectDetector">
-<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.ObjectDetector">[docs]</a>
-<span class="k">class</span> <span class="nc">ObjectDetector</span><span class="p">:</span>
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.ObjectDetector">[docs]</a>
+<span class="k">class</span> <span class="nc">ObjectDetector</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class wraps an object detection model and performs pre-processing and post-processing.&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ObjectDetector.__init__">
-<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.ObjectDetector.__init__">[docs]</a>
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.ObjectDetector.__init__">[docs]</a>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">pre_processor</span><span class="p">:</span> <span class="n">Module</span><span class="p">,</span> <span class="n">post_processor</span><span class="p">:</span> <span class="n">Module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct an Object Detector object.</span>
 
@@ -377,27 +490,27 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">post_processor</span> <span class="o">=</span> <span class="n">post_processor</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="ObjectDetector.predict">
-<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.ObjectDetector.predict">[docs]</a>
+<div class="viewcode-block" id="ObjectDetector.forward">
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.ObjectDetector.forward">[docs]</a>
     <span class="nd">@torch</span><span class="o">.</span><span class="n">inference_mode</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imgs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect objects in a given list of images.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            imgs: list of RGB images. Each image is a Tensor with shape :math:`(3, H, W)`.</span>
+<span class="sd">            images: list of RGB images. Each image is a Tensor with shape :math:`(3, H, W)`.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list of detections found in each image. For item in a batch, shape is :math:`(D, 6)`, where :math:`D` is the</span>
 <span class="sd">            number of detections in the given image, :math:`6` represents class id, score, and `xywh` bounding box.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">imgs</span><span class="p">,</span> <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_processor</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">imgs</span><span class="p">)</span>
-        <span class="n">detections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processor</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">meta</span><span class="p">)</span>
+        <span class="n">images</span><span class="p">,</span> <span class="n">images_sizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_processor</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="n">logits</span><span class="p">,</span> <span class="n">boxes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="n">detections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_processor</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">boxes</span><span class="p">,</span> <span class="n">images_sizes</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">detections</span></div>
 
 
 <div class="viewcode-block" id="ObjectDetector.compile">
-<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.ObjectDetector.compile">[docs]</a>
+<a class="viewcode-back" href="../../../contrib.html#kornia.contrib.object_detection.ObjectDetector.compile">[docs]</a>
     <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>

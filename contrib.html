@@ -884,12 +884,93 @@ Default:  <code class="code docutils literal notranslate"><span class="pre">750<
 <section id="object-detection">
 <h2>Object Detection<a class="headerlink" href="#object-detection" title="Link to this heading">#</a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="kornia.contrib.ObjectDetector">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kornia.contrib.</span></span><span class="sig-name descname"><span class="pre">ObjectDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_processor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_processor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.ObjectDetector" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.BoundingBoxDataFormat">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kornia.contrib.object_detection.</span></span><span class="sig-name descname"><span class="pre">BoundingBoxDataFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#BoundingBoxDataFormat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.BoundingBoxDataFormat" title="Link to this definition">#</a></dt>
+<dd><p>Enum class that maps bounding box data format.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.BoundingBoxDataFormat.XYWH">
+<span class="sig-name descname"><span class="pre">XYWH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#kornia.contrib.object_detection.BoundingBoxDataFormat.XYWH" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.BoundingBoxDataFormat.XYXY">
+<span class="sig-name descname"><span class="pre">XYXY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#kornia.contrib.object_detection.BoundingBoxDataFormat.XYXY" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.BoundingBoxDataFormat.CXCYWH">
+<span class="sig-name descname"><span class="pre">CXCYWH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#kornia.contrib.object_detection.BoundingBoxDataFormat.CXCYWH" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.BoundingBoxDataFormat.CENTER_XYWH">
+<span class="sig-name descname"><span class="pre">CENTER_XYWH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#kornia.contrib.object_detection.BoundingBoxDataFormat.CENTER_XYWH" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.BoundingBox">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kornia.contrib.object_detection.</span></span><span class="sig-name descname"><span class="pre">BoundingBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#BoundingBox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.BoundingBox" title="Link to this definition">#</a></dt>
+<dd><p>Bounding box data class.</p>
+<p>Useful for representing bounding boxes in different formats for object detection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]) – tuple of bounding box data. The length of the tuple depends on the data format.</p></li>
+<li><p><strong>data_format</strong> (<a class="reference internal" href="#kornia.contrib.object_detection.BoundingBoxDataFormat" title="kornia.contrib.object_detection.BoundingBoxDataFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundingBoxDataFormat</span></code></a>) – bounding box data format.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.BoundingBox.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#kornia.contrib.object_detection.BoundingBox.data" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.BoundingBox.data_format">
+<span class="sig-name descname"><span class="pre">data_format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBoxDataFormat" title="kornia.contrib.object_detection.BoundingBoxDataFormat"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundingBoxDataFormat</span></code></a></em><a class="headerlink" href="#kornia.contrib.object_detection.BoundingBox.data_format" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ObjectDetectorResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kornia.contrib.object_detection.</span></span><span class="sig-name descname"><span class="pre">ObjectDetectorResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetectorResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.ObjectDetectorResult" title="Link to this definition">#</a></dt>
+<dd><p>Object detection result.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – class id of the detected object.</p></li>
+<li><p><strong>confidence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – confidence score of the detected object.</p></li>
+<li><p><strong>bbox</strong> (<a class="reference internal" href="#kornia.contrib.object_detection.BoundingBox" title="kornia.contrib.object_detection.BoundingBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundingBox</span></code></a>) – bounding box of the detected object in xywh format.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ObjectDetectorResult.bbox">
+<span class="sig-name descname"><span class="pre">bbox</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBox" title="kornia.contrib.object_detection.BoundingBox"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundingBox</span></code></a></em><a class="headerlink" href="#kornia.contrib.object_detection.ObjectDetectorResult.bbox" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ObjectDetectorResult.class_id">
+<span class="sig-name descname"><span class="pre">class_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><a class="headerlink" href="#kornia.contrib.object_detection.ObjectDetectorResult.class_id" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ObjectDetectorResult.confidence">
+<span class="sig-name descname"><span class="pre">confidence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#kornia.contrib.object_detection.ObjectDetectorResult.confidence" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ObjectDetector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kornia.contrib.object_detection.</span></span><span class="sig-name descname"><span class="pre">ObjectDetector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_processor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_processor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.ObjectDetector" title="Link to this definition">#</a></dt>
 <dd><p>This class wraps an object detection model and performs pre-processing and post-processing.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="kornia.contrib.ObjectDetector.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_processor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_processor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.ObjectDetector.__init__" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ObjectDetector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pre_processor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">post_processor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.ObjectDetector.__init__" title="Link to this definition">#</a></dt>
 <dd><p>Construct an Object Detector object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -903,8 +984,8 @@ Default:  <code class="code docutils literal notranslate"><span class="pre">750<
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="kornia.contrib.ObjectDetector.compile">
-<span class="sig-name descname"><span class="pre">compile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fullgraph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inductor'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetector.compile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.ObjectDetector.compile" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ObjectDetector.compile">
+<span class="sig-name descname"><span class="pre">compile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fullgraph</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'inductor'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">options</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetector.compile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.ObjectDetector.compile" title="Link to this definition">#</a></dt>
 <dd><p>Compile the internal object detection model with <a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.compile.html#torch.compile" title="(in PyTorch v2.0)"><code class="xref py py-func docutils literal notranslate"><span class="pre">torch.compile()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
@@ -914,12 +995,12 @@ Default:  <code class="code docutils literal notranslate"><span class="pre">750<
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="kornia.contrib.ObjectDetector.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetector.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.ObjectDetector.predict" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ObjectDetector.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ObjectDetector.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.ObjectDetector.forward" title="Link to this definition">#</a></dt>
 <dd><p>Detect objects in a given list of images.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>imgs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]) – list of RGB images. Each image is a Tensor with shape <span class="math notranslate nohighlight">\((3, H, W)\)</span>.</p>
+<dd class="field-odd"><p><strong>images</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]) – list of RGB images. Each image is a Tensor with shape <span class="math notranslate nohighlight">\((3, H, W)\)</span>.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]</p>
@@ -931,6 +1012,46 @@ number of detections in the given image, <span class="math notranslate nohighlig
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ResizePreProcessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kornia.contrib.object_detection.</span></span><span class="sig-name descname"><span class="pre">ResizePreProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ResizePreProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.ResizePreProcessor" title="Link to this definition">#</a></dt>
+<dd><p>This module resizes a list of image tensors to the given size.</p>
+<p>Additionally, also returns the original image sizes for further post-processing.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.ResizePreProcessor.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">imgs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#ResizePreProcessor.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.ResizePreProcessor.forward" title="Link to this definition">#</a></dt>
+<dd><p>Defines the computation performed at every call.</p>
+<p>Should be overridden by all subclasses.
+:rtype: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="image.html#kornia.image.ImageSize" title="kornia.image.base.ImageSize"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageSize</span></code></a>]]</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although the recipe for forward pass needs to be defined within
+this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
+instead of this since the former takes care of running the
+registered hooks while the latter silently ignores them.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="kornia.contrib.object_detection.results_from_detections">
+<span class="sig-prename descclassname"><span class="pre">kornia.contrib.object_detection.</span></span><span class="sig-name descname"><span class="pre">results_from_detections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detections</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/object_detection.html#results_from_detections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.object_detection.results_from_detections" title="Link to this definition">#</a></dt>
+<dd><p>Convert a detection tensor to a list of <a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetectorResult" title="kornia.contrib.object_detection.ObjectDetectorResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDetectorResult</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>detections</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>) – tensor with shape <span class="math notranslate nohighlight">\((D, 6)\)</span>, where <span class="math notranslate nohighlight">\(D\)</span> is the number of detections in the given image,
+<span class="math notranslate nohighlight">\(6\)</span> represents class id, score, and <cite>xywh</cite> bounding box.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetectorResult" title="kornia.contrib.object_detection.ObjectDetectorResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDetectorResult</span></code></a>]</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of <a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetectorResult" title="kornia.contrib.object_detection.ObjectDetectorResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObjectDetectorResult</span></code></a>.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <section id="real-time-detection-transformer-rt-detr">
@@ -1086,11 +1207,15 @@ Default:  <code class="code docutils literal notranslate"><span class="pre">None
 <dd class="field-odd"><p><strong>images</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>) – images to be detected. Shape <span class="math notranslate nohighlight">\((N, C, H, W)\)</span>.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dictionary with keys <code class="docutils literal notranslate"><span class="pre">logits</span></code> and <code class="docutils literal notranslate"><span class="pre">boxes</span></code>. <code class="docutils literal notranslate"><span class="pre">logits</span></code> has shape <span class="math notranslate nohighlight">\((N, Q, K)\)</span> and <code class="docutils literal notranslate"><span class="pre">boxes</span></code> has
-shape <span class="math notranslate nohighlight">\((N, Q, 4)\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is the number of queries, <span class="math notranslate nohighlight">\(K\)</span> is the number of classes.</p>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><strong>logits</strong> - Tensor of shape <span class="math notranslate nohighlight">\((N, Q, K)\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is the number of queries,
+<span class="math notranslate nohighlight">\(K\)</span> is the number of classes.</p></li>
+<li><p><strong>boxes</strong> - Tensor of shape <span class="math notranslate nohighlight">\((N, Q, 4)\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is the number of queries.</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1140,16 +1265,16 @@ Default:  <code class="code docutils literal notranslate"><span class="pre">None
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">kornia.contrib.models.rt_detr.</span></span><span class="sig-name descname"><span class="pre">DETRPostProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">confidence_threshold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/models/rt_detr/post_processor.html#DETRPostProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.models.rt_detr.DETRPostProcessor" title="Link to this definition">#</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="kornia.contrib.models.rt_detr.DETRPostProcessor.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/models/rt_detr/post_processor.html#DETRPostProcessor.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.models.rt_detr.DETRPostProcessor.forward" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boxes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_sizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kornia/contrib/models/rt_detr/post_processor.html#DETRPostProcessor.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#kornia.contrib.models.rt_detr.DETRPostProcessor.forward" title="Link to this definition">#</a></dt>
 <dd><p>Post-process outputs from DETR.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>]) – dictionary with keys <code class="docutils literal notranslate"><span class="pre">logits</span></code> and <code class="docutils literal notranslate"><span class="pre">boxes</span></code>. <code class="docutils literal notranslate"><span class="pre">logits</span></code> has shape <span class="math notranslate nohighlight">\((N, Q, K)\)</span> and
-<code class="docutils literal notranslate"><span class="pre">boxes</span></code> has shape <span class="math notranslate nohighlight">\((N, Q, 4)\)</span>, where <span class="math notranslate nohighlight">\(Q\)</span> is the number of queries, <span class="math notranslate nohighlight">\(K\)</span>
-is the number of classes.</p></li>
-<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]) – dictionary containing meta information. It must have key <code class="docutils literal notranslate"><span class="pre">original_size</span></code>, which is the
-original image size of input images. Each tuple represent (img_height, img_width).</p></li>
+<li><p><strong>logits</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>) – tensor with shape <span class="math notranslate nohighlight">\((N, Q, K)\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the batch size, <span class="math notranslate nohighlight">\(Q\)</span> is the number of
+queries, <span class="math notranslate nohighlight">\(K\)</span> is the number of classes.</p></li>
+<li><p><strong>boxes</strong> (<a class="reference external" href="https://pytorch.org/docs/stable/tensors.html#torch.Tensor" title="(in PyTorch v2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tensor</span></code></a>) – tensor with shape <span class="math notranslate nohighlight">\((N, Q, 4)\)</span>, where <span class="math notranslate nohighlight">\(N\)</span> is the batch size, <span class="math notranslate nohighlight">\(Q\)</span> is the number of
+queries.</p></li>
+<li><p><strong>original_sizes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="image.html#kornia.image.ImageSize" title="kornia.image.base.ImageSize"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageSize</span></code></a>]) – list of tuples, each tuple represent (img_height, img_width).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -2149,12 +2274,35 @@ Default:  <code class="code docutils literal notranslate"><span class="pre">0.35
 </ul>
 </li>
 <li><a class="reference internal" href="#object-detection">Object Detection</a><ul>
-<li><a class="reference internal" href="#kornia.contrib.ObjectDetector"><code class="docutils literal notranslate"><span class="pre">ObjectDetector</span></code></a><ul>
-<li><a class="reference internal" href="#kornia.contrib.ObjectDetector.__init__"><code class="docutils literal notranslate"><span class="pre">ObjectDetector.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#kornia.contrib.ObjectDetector.compile"><code class="docutils literal notranslate"><span class="pre">ObjectDetector.compile()</span></code></a></li>
-<li><a class="reference internal" href="#kornia.contrib.ObjectDetector.predict"><code class="docutils literal notranslate"><span class="pre">ObjectDetector.predict()</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBoxDataFormat"><code class="docutils literal notranslate"><span class="pre">BoundingBoxDataFormat</span></code></a><ul>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBoxDataFormat.XYWH"><code class="docutils literal notranslate"><span class="pre">BoundingBoxDataFormat.XYWH</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBoxDataFormat.XYXY"><code class="docutils literal notranslate"><span class="pre">BoundingBoxDataFormat.XYXY</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBoxDataFormat.CXCYWH"><code class="docutils literal notranslate"><span class="pre">BoundingBoxDataFormat.CXCYWH</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBoxDataFormat.CENTER_XYWH"><code class="docutils literal notranslate"><span class="pre">BoundingBoxDataFormat.CENTER_XYWH</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBox"><code class="docutils literal notranslate"><span class="pre">BoundingBox</span></code></a><ul>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBox.data"><code class="docutils literal notranslate"><span class="pre">BoundingBox.data</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.BoundingBox.data_format"><code class="docutils literal notranslate"><span class="pre">BoundingBox.data_format</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetectorResult"><code class="docutils literal notranslate"><span class="pre">ObjectDetectorResult</span></code></a><ul>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetectorResult.bbox"><code class="docutils literal notranslate"><span class="pre">ObjectDetectorResult.bbox</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetectorResult.class_id"><code class="docutils literal notranslate"><span class="pre">ObjectDetectorResult.class_id</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetectorResult.confidence"><code class="docutils literal notranslate"><span class="pre">ObjectDetectorResult.confidence</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetector"><code class="docutils literal notranslate"><span class="pre">ObjectDetector</span></code></a><ul>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetector.__init__"><code class="docutils literal notranslate"><span class="pre">ObjectDetector.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetector.compile"><code class="docutils literal notranslate"><span class="pre">ObjectDetector.compile()</span></code></a></li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ObjectDetector.forward"><code class="docutils literal notranslate"><span class="pre">ObjectDetector.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ResizePreProcessor"><code class="docutils literal notranslate"><span class="pre">ResizePreProcessor</span></code></a><ul>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.ResizePreProcessor.forward"><code class="docutils literal notranslate"><span class="pre">ResizePreProcessor.forward()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#kornia.contrib.object_detection.results_from_detections"><code class="docutils literal notranslate"><span class="pre">results_from_detections()</span></code></a></li>
 <li><a class="reference internal" href="#real-time-detection-transformer-rt-detr">Real-Time Detection Transformer (RT-DETR)</a><ul>
 <li><a class="reference internal" href="#kornia.contrib.models.rt_detr.RTDETRModelType"><code class="docutils literal notranslate"><span class="pre">RTDETRModelType</span></code></a><ul>
 <li><a class="reference internal" href="#kornia.contrib.models.rt_detr.RTDETRModelType.resnet18d"><code class="docutils literal notranslate"><span class="pre">RTDETRModelType.resnet18d</span></code></a></li>
