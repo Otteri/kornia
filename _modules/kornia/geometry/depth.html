@@ -323,7 +323,7 @@
         <article role="main">
           <h1>Source code for kornia.geometry.depth</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module containing operators to work on RGB-Depth images.&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
@@ -337,7 +337,7 @@
 <span class="kn">from</span> <span class="nn">.conversions</span> <span class="kn">import</span> <span class="n">normalize_pixel_coordinates</span>
 <span class="kn">from</span> <span class="nn">.linalg</span> <span class="kn">import</span> <span class="n">compose_transformations</span><span class="p">,</span> <span class="n">convert_points_to_homogeneous</span><span class="p">,</span> <span class="n">inverse_transformation</span><span class="p">,</span> <span class="n">transform_points</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;depth_to_3d&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_to_normals&quot;</span><span class="p">,</span> <span class="s2">&quot;warp_frame_depth&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_warp&quot;</span><span class="p">,</span> <span class="s2">&quot;DepthWarper&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;depth_to_3d&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_to_normals&quot;</span><span class="p">,</span> <span class="s2">&quot;warp_frame_depth&quot;</span><span class="p">,</span> <span class="s2">&quot;DepthWarper&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_warp&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_from_disparity&quot;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="depth_to_3d">
@@ -538,8 +538,8 @@
 
         <span class="c1"># state members</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pinhole_dst</span><span class="p">:</span> <span class="n">PinholeCamera</span> <span class="o">=</span> <span class="n">pinhole_dst</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pinhole_src</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">PinholeCamera</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dst_proj_src</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pinhole_src</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">PinholeCamera</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dst_proj_src</span><span class="p">:</span> <span class="kc">None</span> <span class="o">|</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_meshgrid</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
 
@@ -548,7 +548,7 @@
         <span class="n">grid</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">create_meshgrid</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">normalized_coordinates</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>  <span class="c1"># 1xHxWx2</span>
         <span class="k">return</span> <span class="n">convert_points_to_homogeneous</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>  <span class="c1"># append ones to last dim</span>
 
-    <span class="k">def</span> <span class="nf">compute_projection_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pinhole_src</span><span class="p">:</span> <span class="n">PinholeCamera</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;DepthWarper&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">compute_projection_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pinhole_src</span><span class="p">:</span> <span class="n">PinholeCamera</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DepthWarper</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Compute the projection matrix from the source to destination frame.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pinhole_dst</span><span class="p">,</span> <span class="n">PinholeCamera</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -700,7 +700,7 @@
 
 <div class="viewcode-block" id="depth_from_disparity">
 <a class="viewcode-back" href="../../../geometry.depth.html#kornia.geometry.depth.depth_from_disparity">[docs]</a>
-<span class="k">def</span> <span class="nf">depth_from_disparity</span><span class="p">(</span><span class="n">disparity</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">baseline</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">focal</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">depth_from_disparity</span><span class="p">(</span><span class="n">disparity</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">baseline</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">focal</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes depth from disparity.</span>
 
 <span class="sd">    Args:</span>
@@ -734,7 +734,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">focal</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">):</span>
         <span class="n">KORNIA_CHECK_SHAPE</span><span class="p">(</span><span class="n">focal</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;1&quot;</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="n">baseline</span> <span class="o">*</span> <span class="n">focal</span> <span class="o">/</span> <span class="n">disparity</span></div>
+    <span class="k">return</span> <span class="n">baseline</span> <span class="o">*</span> <span class="n">focal</span> <span class="o">/</span> <span class="p">(</span><span class="n">disparity</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span></div>
 
 </pre></div>
         </article>
