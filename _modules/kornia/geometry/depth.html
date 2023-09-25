@@ -326,24 +326,127 @@
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 
-<span class="kn">from</span> <span class="nn">kornia.core</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">concatenate</span><span class="p">,</span> <span class="n">tensor</span>
+<span class="kn">import</span> <span class="nn">kornia.core</span> <span class="k">as</span> <span class="nn">kornia_ops</span>
+<span class="kn">from</span> <span class="nn">kornia.core</span> <span class="kn">import</span> <span class="n">Module</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">tensor</span>
 <span class="kn">from</span> <span class="nn">kornia.core.check</span> <span class="kn">import</span> <span class="n">KORNIA_CHECK</span><span class="p">,</span> <span class="n">KORNIA_CHECK_IS_TENSOR</span><span class="p">,</span> <span class="n">KORNIA_CHECK_SHAPE</span>
 <span class="kn">from</span> <span class="nn">kornia.filters.sobel</span> <span class="kn">import</span> <span class="n">spatial_gradient</span>
 <span class="kn">from</span> <span class="nn">kornia.utils</span> <span class="kn">import</span> <span class="n">create_meshgrid</span>
 
 <span class="kn">from</span> <span class="nn">.camera</span> <span class="kn">import</span> <span class="n">PinholeCamera</span><span class="p">,</span> <span class="n">cam2pixel</span><span class="p">,</span> <span class="n">pixel2cam</span><span class="p">,</span> <span class="n">project_points</span><span class="p">,</span> <span class="n">unproject_points</span>
-<span class="kn">from</span> <span class="nn">.conversions</span> <span class="kn">import</span> <span class="n">normalize_pixel_coordinates</span>
+<span class="kn">from</span> <span class="nn">.conversions</span> <span class="kn">import</span> <span class="n">normalize_pixel_coordinates</span><span class="p">,</span> <span class="n">normalize_points_with_intrinsics</span>
 <span class="kn">from</span> <span class="nn">.linalg</span> <span class="kn">import</span> <span class="n">compose_transformations</span><span class="p">,</span> <span class="n">convert_points_to_homogeneous</span><span class="p">,</span> <span class="n">inverse_transformation</span><span class="p">,</span> <span class="n">transform_points</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;depth_to_3d&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_to_normals&quot;</span><span class="p">,</span> <span class="s2">&quot;warp_frame_depth&quot;</span><span class="p">,</span> <span class="s2">&quot;DepthWarper&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_warp&quot;</span><span class="p">,</span> <span class="s2">&quot;depth_from_disparity&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;depth_to_3d&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;depth_to_3d_v2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;depth_to_normals&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;warp_frame_depth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;depth_warp&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DepthWarper&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;depth_from_disparity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;unproject_meshgrid&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="unproject_meshgrid">
+<a class="viewcode-back" href="../../../geometry.depth.html#kornia.geometry.depth.unproject_meshgrid">[docs]</a>
+<span class="k">def</span> <span class="nf">unproject_meshgrid</span><span class="p">(</span>
+    <span class="n">height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">camera_matrix</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">normalize_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">dtype</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a 3d point per pixel given its depth value and the camera intrinsics.</span>
+
+<span class="sd">    .. tip::</span>
+
+<span class="sd">        This function should be used in conjunction with :py:func:`kornia.geometry.depth.depth_to_3d_v2` to cache</span>
+<span class="sd">        the meshgrid computation when warping multiple frames with the same camera intrinsics.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        camera_matrix: tensor containing the camera intrinsics with shape :math:`(3, 3)`.</span>
+<span class="sd">        normalize_points: whether to normalise the pointcloud. This must be set to `True` when the depth is</span>
+<span class="sd">          represented as the Euclidean ray length from the camera position.</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        tensor with a 3d point per pixel of the same resolution as the input :math:`(*, H, W, 3)`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">KORNIA_CHECK_SHAPE</span><span class="p">(</span><span class="n">camera_matrix</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">])</span>
+
+    <span class="c1"># create base coordinates grid</span>
+    <span class="n">points_uv</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">create_meshgrid</span><span class="p">(</span>
+        <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">normalized_coordinates</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>  <span class="c1"># HxWx2</span>
+
+    <span class="n">points_xy</span> <span class="o">=</span> <span class="n">normalize_points_with_intrinsics</span><span class="p">(</span><span class="n">points_uv</span><span class="p">,</span> <span class="n">camera_matrix</span><span class="p">)</span>  <span class="c1"># HxWx2</span>
+
+    <span class="c1"># unproject pixels to camera frame</span>
+    <span class="n">points_xyz</span> <span class="o">=</span> <span class="n">convert_points_to_homogeneous</span><span class="p">(</span><span class="n">points_xy</span><span class="p">)</span>  <span class="c1"># HxWx3</span>
+
+    <span class="k">if</span> <span class="n">normalize_points</span><span class="p">:</span>
+        <span class="n">points_xyz</span> <span class="o">=</span> <span class="n">kornia_ops</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">points_xyz</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">points_xyz</span></div>
+
+
+
+<div class="viewcode-block" id="depth_to_3d_v2">
+<a class="viewcode-back" href="../../../geometry.depth.html#kornia.geometry.depth.depth_to_3d_v2">[docs]</a>
+<span class="k">def</span> <span class="nf">depth_to_3d_v2</span><span class="p">(</span>
+    <span class="n">depth</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">camera_matrix</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">normalize_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">xyz_grid</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a 3d point per pixel given its depth value and the camera intrinsics.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        This is an alternative implementation of :py:func:`kornia.geometry.depth.depth_to_3d`</span>
+<span class="sd">        that does not require the creation of a meshgrid.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        depth: image tensor containing a depth value per pixel with shape :math:`(*, H, W)`.</span>
+<span class="sd">        camera_matrix: tensor containing the camera intrinsics with shape :math:`(*, 3, 3)`.</span>
+<span class="sd">        normalize_points: whether to normalise the pointcloud. This must be set to `True` when the depth is</span>
+<span class="sd">          represented as the Euclidean ray length from the camera position.</span>
+
+<span class="sd">    Return:</span>
+<span class="sd">        tensor with a 3d point per pixel of the same resolution as the input :math:`(*, H, W, 3)`.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; depth = torch.rand(4, 4)</span>
+<span class="sd">        &gt;&gt;&gt; K = torch.eye(3)</span>
+<span class="sd">        &gt;&gt;&gt; depth_to_3d_v2(depth, K).shape</span>
+<span class="sd">        torch.Size([4, 4, 3])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">KORNIA_CHECK_SHAPE</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">])</span>
+    <span class="n">KORNIA_CHECK_SHAPE</span><span class="p">(</span><span class="n">camera_matrix</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">])</span>
+
+    <span class="c1"># create base grid if not provided</span>
+    <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">depth</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+    <span class="n">points_xyz</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">xyz_grid</span> <span class="ow">or</span> <span class="n">unproject_meshgrid</span><span class="p">(</span>
+        <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">camera_matrix</span><span class="p">,</span> <span class="n">normalize_points</span><span class="p">,</span> <span class="n">depth</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">depth</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="p">)</span>
+
+    <span class="n">KORNIA_CHECK_SHAPE</span><span class="p">(</span><span class="n">points_xyz</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;H&quot;</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="s2">&quot;3&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">points_xyz</span> <span class="o">*</span> <span class="n">depth</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>  <span class="c1"># HxWx3</span></div>
+
+
+
+<span class="c1"># NOTE: this function should replace the old depth_to_3d</span>
 
 
 <div class="viewcode-block" id="depth_to_3d">
 <a class="viewcode-back" href="../../../geometry.depth.html#kornia.geometry.depth.depth_to_3d">[docs]</a>
 <span class="k">def</span> <span class="nf">depth_to_3d</span><span class="p">(</span><span class="n">depth</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">camera_matrix</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">normalize_points</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute a 3d point per pixel given its depth value and the camera intrinsics.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        This is an alternative implementation of `depth_to_3d` that does not require the creation of a meshgrid.</span>
+<span class="sd">        In future, we will support only this implementation.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        depth: image tensor containing a depth value per pixel with shape :math:`(B, 1, H, W)`.</span>
@@ -432,7 +535,7 @@
     <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">gradients</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">gradients</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span>  <span class="c1"># Bx3xHxW</span>
 
     <span class="n">normals</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Bx3xHxW</span>
-    <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">kornia_ops</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span></div>
 
 
 
@@ -480,6 +583,7 @@
 
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">camera_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">camera_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Input camera_matrix must have a shape (B, 3, 3). Got: </span><span class="si">{</span><span class="n">camera_matrix</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
     <span class="c1"># unproject source points to camera frame</span>
     <span class="n">points_3d_dst</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">depth_to_3d</span><span class="p">(</span><span class="n">depth_dst</span><span class="p">,</span> <span class="n">camera_matrix</span><span class="p">,</span> <span class="n">normalize_points</span><span class="p">)</span>  <span class="c1"># Bx3xHxW</span>
 
@@ -497,7 +601,7 @@
     <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">depth_dst</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
     <span class="n">points_2d_src_norm</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">normalize_pixel_coordinates</span><span class="p">(</span><span class="n">points_2d_src</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>  <span class="c1"># BxHxWx2</span>
 
-    <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">grid_sample</span><span class="p">(</span><span class="n">image_src</span><span class="p">,</span> <span class="n">points_2d_src_norm</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">kornia_ops</span><span class="o">.</span><span class="n">map_coordinates</span><span class="p">(</span><span class="n">image_src</span><span class="p">,</span> <span class="n">points_2d_src_norm</span><span class="p">,</span> <span class="n">align_corners</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
 
@@ -580,7 +684,7 @@
         <span class="n">z</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">flow</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
         <span class="n">_x</span> <span class="o">=</span> <span class="n">flow</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">z</span>
         <span class="n">_y</span> <span class="o">=</span> <span class="n">flow</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">z</span>
-        <span class="k">return</span> <span class="n">concatenate</span><span class="p">([</span><span class="n">_x</span><span class="p">,</span> <span class="n">_y</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">kornia_ops</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">_x</span><span class="p">,</span> <span class="n">_y</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">compute_subpixel_step</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the required inverse depth step to achieve sub pixel accurate sampling of the depth cost volume,</span>
@@ -660,7 +764,7 @@
 <span class="sd">            &gt;&gt;&gt; image_dst = torch.rand(1, 3, 32, 32)  # NxCxHxW</span>
 <span class="sd">            &gt;&gt;&gt; image_src = warper(depth_src, image_dst)  # NxCxHxW</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">grid_sample</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">kornia_ops</span><span class="o">.</span><span class="n">map_coordinates</span><span class="p">(</span>
             <span class="n">patch_dst</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">warp_grid</span><span class="p">(</span><span class="n">depth_src</span><span class="p">),</span>
             <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">,</span>

@@ -380,6 +380,8 @@
     <span class="k">elif</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span>
         <span class="n">res1</span> <span class="o">=</span> <span class="n">res1</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">reduce_axes</span><span class="p">)</span>
         <span class="n">res2</span> <span class="o">=</span> <span class="n">res2</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">reduce_axes</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Invalid reduction option.&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">res1</span> <span class="o">+</span> <span class="n">res2</span></div>
 
